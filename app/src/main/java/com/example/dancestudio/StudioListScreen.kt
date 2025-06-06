@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -29,32 +30,35 @@ import androidx.compose.ui.unit.sp
 import com.example.dancestudio.ui.theme.DanceStudioTheme
 import com.example.dancestudio.ui.theme.Manrope
 
-// Main composable that displays the screen with filters, search, and studio list
+/**
+ * Main composable function for the Studio List screen.
+ * Displays the location header, search input, filter chips, and a scrollable list of studio cards.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudioListScreen(
     modifier: Modifier = Modifier,
-    onStudioSelected: (Studio) -> Unit = {},  // Callback when a studio is tapped
-    onFilterChanged: (FilterType) -> Unit = {} // Callback when a filter is changed
+    onStudioSelected: (Studio) -> Unit = {},  // Callback when a studio card is clicked
+    onFilterChanged: (FilterType) -> Unit = {} // Callback when a filter is selected
 ) {
-    var searchQuery by remember { mutableStateOf("") } // Tracks current search input
-    val filters = listOf("Best", "Popular", "Nearby", "New", "Affordable") // Filter chip labels
-    var selectedFilter by remember { mutableIntStateOf(0) } // Currently selected filter index
+    var searchQuery by remember { mutableStateOf("") } // Search input state
+    val filters = listOf("Best", "Popular", "Nearby", "New", "Affordable") // List of filter options
+    var selectedFilter by remember { mutableIntStateOf(0) } // Index of the selected filter
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(horizontal = 16.dp) // Outer padding
+            .padding(horizontal = 16.dp)
     ) {
-        // LOCATION HEADER
+        // LOCATION INDICATOR HEADER
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 16.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.LocationOn,
-                contentDescription = "Location",
+                contentDescription = "Location Icon",
                 tint = Color.Black
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -67,10 +71,10 @@ fun StudioListScreen(
             )
         }
 
-        // SEARCH BAR
+        // SEARCH TEXT FIELD
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = { searchQuery = it }, // Updates search query
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
@@ -85,11 +89,11 @@ fun StudioListScreen(
             )
         )
 
-        // HORIZONTAL FILTER CHIPS (SCROLLABLE)
+        // HORIZONTAL SCROLLABLE FILTER CHIPS
         Row(
             modifier = Modifier
                 .padding(vertical = 16.dp)
-                .horizontalScroll(rememberScrollState()), // Enables horizontal scrolling
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             filters.forEachIndexed { index, filter ->
@@ -97,7 +101,7 @@ fun StudioListScreen(
                     selected = selectedFilter == index,
                     onClick = {
                         selectedFilter = index
-                        onFilterChanged(FilterType.entries[index]) // Notify parent about filter change
+                        onFilterChanged(FilterType.entries[index]) // Notify filter change
                     },
                     label = { Text(filter, fontFamily = Manrope) },
                     colors = FilterChipDefaults.filterChipColors(
@@ -109,7 +113,7 @@ fun StudioListScreen(
             }
         }
 
-        // VERTICAL STUDIO LIST (SCROLLABLE DOWN)
+        // VERTICAL LIST OF STUDIOS
         LazyColumn(
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
@@ -117,14 +121,16 @@ fun StudioListScreen(
                 StudioCard(
                     studio = studio,
                     modifier = Modifier.padding(bottom = 16.dp),
-                    onClick = { onStudioSelected(studio) } // Handle card click
+                    onClick = { onStudioSelected(studio) } // Card click handler
                 )
             }
         }
     }
 }
 
-// Sample data for preview and development use
+/**
+ * Provides sample static studio data for UI previews and testing.
+ */
 private fun getSampleStudioList(): List<Studio> {
     return listOf(
         Studio(
@@ -134,7 +140,7 @@ private fun getSampleStudioList(): List<Studio> {
             size = 150,
             hourlyRate = 25,
             rating = 4.93f,
-            imageRes = R.drawable.studio_sample // Replace with actual drawable
+            imageRes = R.drawable.studio_sample // Placeholder image resource
         ),
         Studio(
             id = "2",
@@ -143,13 +149,15 @@ private fun getSampleStudioList(): List<Studio> {
             size = 200,
             hourlyRate = 30,
             rating = 4.8f,
-            imageRes = R.drawable.studio_sample // Replace with actual drawable
+            imageRes = R.drawable.studio_sample
         )
-        // Add more items here to test scrolling
+        // Add more studios here to populate the list
     )
 }
 
-// Studio card component displaying image, rating, and studio info
+/**
+ * Composable for displaying individual studio card with image, rating, and info.
+ */
 @Composable
 fun StudioCard(
     studio: Studio,
@@ -159,13 +167,20 @@ fun StudioCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick), // Makes entire card tappable
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .clickable(onClick = onClick), // Entire card is tappable
+        shape = RoundedCornerShape(16.dp), // Rounded card corners
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Column {
-            // STUDIO IMAGE WITH RATING OVERLAY
-            Box(modifier = Modifier.aspectRatio(1.5f)) {
+            // STUDIO IMAGE SECTION
+            Box(
+                modifier = Modifier
+                    .aspectRatio(1.5f) // Sets aspect ratio for consistent image shape
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) // Rounded top corners
+            ) {
                 Image(
                     painter = painterResource(id = studio.imageRes),
                     contentDescription = studio.name,
@@ -173,7 +188,7 @@ fun StudioCard(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // RATING BADGE TOP-RIGHT
+                // RATING BADGE OVERLAY
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
@@ -188,86 +203,114 @@ fun StudioCard(
                             tint = Color.White,
                             modifier = Modifier.size(16.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = studio.rating.toString(),
                             color = Color.White,
-                            fontFamily = Manrope,
+                            modifier = Modifier.padding(start = 4.dp),
                             fontSize = 12.sp
                         )
                     }
                 }
             }
 
-            // STUDIO DETAILS TEXT
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = studio.name,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = Manrope,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Place,
-                        contentDescription = "Location",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = studio.location,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = Manrope,
-                            color = Color.Gray
+            // STUDIO TEXT DETAILS SECTION
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Left column: studio name, location, size
+                    Column {
+                        Text(
+                            text = studio.name,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontFamily = Manrope,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
                         )
-                    )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = "Location",
+                                tint = Color.Gray,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = studio.location,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = Manrope,
+                                    color = Color.Gray
+                                ),
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Size: ${studio.size} m²",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = Manrope,
+                                color = Color.Gray
+                            )
+                        )
+                    }
+
+                    // Right column: pricing info
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = "$${studio.hourlyRate}",
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontFamily = Manrope,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                        )
+                        Text(
+                            text = "per hour",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = Manrope,
+                                color = Color.Gray
+                            )
+                        )
+                    }
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Size: ${studio.size} m²",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = Manrope,
-                        color = Color.Gray
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "$${studio.hourlyRate}/hour",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontFamily = Manrope,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                )
             }
         }
     }
 }
 
-// Data model representing a dance studio
+/**
+ * Data model class representing a dance studio entity.
+ */
 data class Studio(
     val id: String,
     val name: String,
     val location: String,
-    val size: Int,
-    val hourlyRate: Int,
-    val rating: Float,
-    val imageRes: Int
+    val size: Int,            // Studio size in square meters
+    val hourlyRate: Int,      // Rental rate per hour in USD
+    val rating: Float,        // Rating out of 5
+    val imageRes: Int         // Resource ID for the studio image
 )
 
-// Enum representing different filter types
+/**
+ * Enum for studio filter options.
+ * Matches UI filter chip labels for filtering the studio list.
+ */
 enum class FilterType { BEST, POPULAR, NEARBY, NEW, AFFORDABLE }
 
-// Preview function to display the UI inside Android Studio Preview
+/**
+ * Preview function to render the StudioListScreen inside Android Studio.
+ * Useful for UI testing during development.
+ */
 @Preview
 @Composable
 fun StudioListPreview() {
