@@ -66,7 +66,7 @@ fun StudioListScreen(
                 text = "You are here · Indonesia",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontFamily = Manrope,
-                    color = Color.Red
+                    color = Color.Gray
                 )
             )
         }
