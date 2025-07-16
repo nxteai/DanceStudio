@@ -39,7 +39,7 @@ fun SignUpScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color.White)  // White background to match StudioListScreen
     ) {
         Column(
             modifier = Modifier
@@ -47,27 +47,6 @@ fun SignUpScreen(navController: NavHostController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // 🔙 Back Arrow
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = {
-                    navController.navigate("welcome") {
-                        popUpTo("signup") { inclusive = true } // Optional: remove 'signup' from backstack
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.Black
-                    )
-                }
-            }
-
             Text(
                 text = "Sign Up",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -81,7 +60,8 @@ fun SignUpScreen(navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(8.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = Color.White) // <-- This line sets the background color
+
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     InputField(label = "Full Name", icon = Icons.Default.Person)
@@ -111,7 +91,7 @@ fun SignUpScreen(navController: NavHostController) {
             }
 
             Button(
-                onClick = { navController.navigate("signup") },
+                onClick = {  run { navController.navigate("signup") } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
@@ -168,7 +148,6 @@ fun SignUpScreen(navController: NavHostController) {
         }
     }
 }
-
 
 @Composable
 
