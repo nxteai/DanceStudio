@@ -1,27 +1,19 @@
 package com.example.dancestudio
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,8 +23,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.dancestudio.ui.theme.DanceStudioTheme
 import com.example.dancestudio.ui.theme.Manrope
-import androidx.compose.material.icons.filled.ArrowBack
-
 
 @Composable
 fun SignUpScreen(navController: NavHostController) {
@@ -47,6 +37,26 @@ fun SignUpScreen(navController: NavHostController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Back button row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    navController.navigate("welcome") {
+                        popUpTo("signup") { inclusive = true } // Remove signup from backstack
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.Black
+                    )
+                }
+            }
+
             Text(
                 text = "Sign Up",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -60,8 +70,7 @@ fun SignUpScreen(navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(8.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White) // <-- This line sets the background color
-
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     InputField(label = "Full Name", icon = Icons.Default.Person)
@@ -91,7 +100,7 @@ fun SignUpScreen(navController: NavHostController) {
             }
 
             Button(
-                onClick = {  run { navController.navigate("signup") } },
+                onClick = { navController.navigate("signup") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
@@ -150,7 +159,6 @@ fun SignUpScreen(navController: NavHostController) {
 }
 
 @Composable
-
 fun SocialButton(
     text: String,
     color: Color,
@@ -165,7 +173,6 @@ fun SocialButton(
         Text(text = text, color = Color.White)
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -196,16 +203,14 @@ fun InputField(
             focusedBorderColor = Color.Black,
             focusedLabelColor = Color.Black,
             unfocusedLabelColor = Color.Gray,
-            )
+        )
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
     DanceStudioTheme {
-        // We provide a dummy NavController since SignUpScreen requires one
         val dummyNavController = rememberNavController()
         SignUpScreen(navController = dummyNavController)
     }
