@@ -33,10 +33,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.dancestudio.ui.theme.Manrope
+import androidx.navigation.compose.rememberNavController
+
+
 
 @Composable
-fun DanceStudioWelcomeScreen() {
+fun DanceStudioWelcomeScreen(navController: NavHostController) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val isLargeScreen = configuration.screenWidthDp >= 600 // Tablet or larger
@@ -110,7 +114,7 @@ fun DanceStudioWelcomeScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = { /* Create account */ },
+                        onClick = { navController.navigate("signup") },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         shape = RoundedCornerShape(10.dp),
                         border = BorderStroke(1.dp, Color.Black),
@@ -184,7 +188,7 @@ fun DanceStudioWelcomeScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = { /* Create account */ },
+                        onClick = { run { navController.navigate("signup") } },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         shape = RoundedCornerShape(10.dp),
                         border = BorderStroke(1.dp, Color.Black),
@@ -199,8 +203,10 @@ fun DanceStudioWelcomeScreen() {
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun DanceStudioWelcomeScreenPreview() {
-    DanceStudioWelcomeScreen()
+    val navController = rememberNavController()
+    DanceStudioWelcomeScreen(navController)
 }

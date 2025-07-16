@@ -2,6 +2,7 @@ package com.example.dancestudio
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -25,19 +27,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.dancestudio.ui.theme.DanceStudioTheme
 import com.example.dancestudio.ui.theme.Manrope
+import androidx.compose.material.icons.filled.ArrowBack
+
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    listOf(Color(0xFF00C6FF), Color(0xFF0072FF))
-                )
-            )
+            .background(Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -45,59 +47,92 @@ fun SignUpScreen() {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            // 🔙 Back Arrow
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    navController.navigate("welcome") {
+                        popUpTo("signup") { inclusive = true } // Optional: remove 'signup' from backstack
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.Black
+                    )
+                }
+            }
+
             Text(
                 text = "Sign Up",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.White,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontFamily = Manrope,
+                    color = Color.Black
+                ),
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(8.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     InputField(label = "Full Name", icon = Icons.Default.Person)
                     Spacer(modifier = Modifier.height(12.dp))
-                    InputField(label = "Email", icon = Icons.Default.Email)
+                    InputField(label = "Email", icon = Icons.Default.Email, keyboardType = KeyboardType.Email)
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "+225",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontFamily = Manrope,
+                                color = Color.Black
+                            ),
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        InputField(label = "Mobile Number", icon = Icons.Default.Phone)
+                        InputField(label = "Mobile Number", icon = Icons.Default.Phone, keyboardType = KeyboardType.Phone)
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     InputField(
                         label = "Password",
                         icon = Icons.Default.Lock,
-                        visualTransformation = PasswordVisualTransformation()
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardType = KeyboardType.Password
                     )
                 }
             }
 
             Button(
-                onClick = { /* TODO: Handle create account */ },
+                onClick = { navController.navigate("signup") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
             ) {
                 Text(
                     text = "Create Account",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Color.White
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontFamily = Manrope,
+                        color = Color.White
+                    )
                 )
             }
 
             Text(
                 text = "or sign in using",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = Manrope,
+                    color = Color.Gray
+                ),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -111,119 +146,88 @@ fun SignUpScreen() {
 
             Text(
                 text = "By creating an account, you agree to our Terms",
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 12.sp),
-                color = Color.White,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = Manrope,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
             Text(
                 text = "Already have an account? Sign In",
-                style = MaterialTheme.typography.labelLarge,
-                color = Color.White
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontFamily = Manrope,
+                    color = Color.Black
+                ),
+                modifier = Modifier.clickable {
+                    // TODO: Navigate to sign-in screen
+                }
             )
         }
     }
 }
 
+
+@Composable
+
+fun SocialButton(
+    text: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.padding(8.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = color)
+    ) {
+        Text(text = text, color = Color.White)
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputField(
     label: String,
     icon: ImageVector,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     val textState = remember { mutableStateOf(TextFieldValue()) }
 
     OutlinedTextField(
         value = textState.value,
         onValueChange = { textState.value = it },
-        label = { Text(text = label, fontFamily = Manrope) },
-        leadingIcon = { Icon(icon, contentDescription = null) },
+        label = { Text(text = label, fontFamily = Manrope, color = Color.Gray) },
+        leadingIcon = { Icon(icon, contentDescription = null, tint = Color.Black) },
         visualTransformation = visualTransformation,
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Next,
-            keyboardType = KeyboardType.Text
+            keyboardType = keyboardType
         ),
-        textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = Manrope)
+        textStyle = MaterialTheme.typography.bodyLarge.copy(
+            fontFamily = Manrope,
+            color = Color.Black
+        ),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Black,
+            focusedLabelColor = Color.Black,
+            unfocusedLabelColor = Color.Gray,
+            )
     )
 }
 
-@Composable
-fun SocialButton(text: String, color: Color, modifier: Modifier = Modifier) {
-    Button(
-        onClick = { /* TODO: Social login */ },
-        colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier.height(48.dp)
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            style = MaterialTheme.typography.labelLarge
-        )
-    }
-}
 
-@Composable
-fun MyBlackButton() {
-    Button(
-        onClick = { /* Handle click */ },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF000000) // Pure black
-        ),
-        shape = RoundedCornerShape(10.dp), // Matches Figma's 10 corner radius
-        modifier = Modifier
-            .width(353.dp) // Exact width from Figma
-            .height(56.dp) // Exact height from Figma
-    ) {
-        Text(
-            text = "Button",
-            color = Color.White,
-            fontSize = 16.sp,
-            fontFamily = Manrope, // Using your existing font
-            fontWeight = FontWeight.Bold,
-            lineHeight = 20.sp // 125% of 16sp = 20sp
-        )
-    }
-}
-
-@Composable
-fun MyWhiteButton() {
-    Button(
-        onClick = { /* Handle click */ },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White, // White background
-            contentColor = Color.Black  // Black text
-        ),
-        shape = RoundedCornerShape(10.dp), // Same corner radius as black button
-        border = BorderStroke(1.dp, Color.Black), // Black border
-        modifier = Modifier
-            .width(353.dp) // Same width as black button
-            .height(56.dp) // Same height as black button
-    ) {
-        Text(
-            text = "Button",
-            fontSize = 16.sp,
-            fontFamily = Manrope,
-            fontWeight = FontWeight.SemiBold,
-            lineHeight = 20.sp // 125% line height
-        )
-    }
-}
-
-// Preview showing both buttons stacked
 @Preview(showBackground = true)
 @Composable
-fun ButtonPairPreview() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        MyBlackButton()
-        MyWhiteButton()
+fun SignUpScreenPreview() {
+    DanceStudioTheme {
+        // We provide a dummy NavController since SignUpScreen requires one
+        val dummyNavController = rememberNavController()
+        SignUpScreen(navController = dummyNavController)
     }
 }
