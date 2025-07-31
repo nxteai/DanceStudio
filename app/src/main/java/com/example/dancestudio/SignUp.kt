@@ -24,12 +24,27 @@ import androidx.navigation.compose.rememberNavController
 import com.example.dancestudio.ui.theme.DanceStudioTheme
 import com.example.dancestudio.ui.theme.Manrope
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import android.widget.Toast
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.platform.LocalContext
+
 @Composable
 fun SignUpScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+
+    val name = remember { mutableStateOf("") }
+    val email = remember { mutableStateOf("") }
+    val phone = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)  // White background to match StudioListScreen
+            .background(Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -37,7 +52,6 @@ fun SignUpScreen(navController: NavHostController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Back button row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -46,11 +60,11 @@ fun SignUpScreen(navController: NavHostController) {
             ) {
                 IconButton(onClick = {
                     navController.navigate("welcome") {
-                        popUpTo("signup") { inclusive = true } // Remove signup from backstack
+                        popUpTo("signup") { inclusive = true }
                     }
                 }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
                         tint = Color.Black
                     )
@@ -73,34 +87,52 @@ fun SignUpScreen(navController: NavHostController) {
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    InputField(label = "Full Name", icon = Icons.Default.Person)
+                    InputField(label = "Full Name", icon = Icons.Default.Person, textState = name)
                     Spacer(modifier = Modifier.height(12.dp))
-                    InputField(label = "Email", icon = Icons.Default.Email, keyboardType = KeyboardType.Email)
+                    InputField(label = "Email", icon = Icons.Default.Email, keyboardType = KeyboardType.Email, textState = email)
                     Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "+225",
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = Manrope,
-                                color = Color.Black
-                            ),
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        InputField(label = "Mobile Number", icon = Icons.Default.Phone, keyboardType = KeyboardType.Phone)
-                    }
+                    InputField(label = "Mobile Number", icon = Icons.Default.Phone, keyboardType = KeyboardType.Phone, textState = phone)
                     Spacer(modifier = Modifier.height(12.dp))
                     InputField(
                         label = "Password",
                         icon = Icons.Default.Lock,
                         visualTransformation = PasswordVisualTransformation(),
-                        keyboardType = KeyboardType.Password
+                        keyboardType = KeyboardType.Password,
+                        textState = password
                     )
                 }
             }
 
             Button(
-                onClick = { navController.navigate("signup") },
+                onClick = {
+                    if (name.value.isBlank() || email.value.isBlank() || password.value.length < 6) {
+                        Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    auth.createUserWithEmailAndPassword(email.value, password.value)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+                                val userMap = hashMapOf(
+                                    "fullName" to name.value,
+                                    "email" to email.value,
+                                    "phone" to phone.value
+                                )
+
+                                db.collection("users").document(userId).set(userMap)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(context, "Account created!", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("home") // Update with your next screen
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(context, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                                    }
+                            } else {
+                                Toast.makeText(context, "Sign up failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
@@ -151,12 +183,13 @@ fun SignUpScreen(navController: NavHostController) {
                     color = Color.Black
                 ),
                 modifier = Modifier.clickable {
-                    // TODO: Navigate to sign-in screen
+                    navController.navigate("login") // implement this screen later
                 }
             )
         }
     }
 }
+
 
 @Composable
 fun SocialButton(
@@ -179,11 +212,10 @@ fun SocialButton(
 fun InputField(
     label: String,
     icon: ImageVector,
+    textState: MutableState<String>,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
-    val textState = remember { mutableStateOf(TextFieldValue()) }
-
     OutlinedTextField(
         value = textState.value,
         onValueChange = { textState.value = it },

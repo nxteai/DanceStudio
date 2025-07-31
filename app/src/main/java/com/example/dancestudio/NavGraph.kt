@@ -14,5 +14,9 @@ fun AppNavGraph(navController: NavHostController) {
         composable("signup") {
             SignUpScreen(navController)
         }
+        composable("login") {
+            LoginScreen(navController)
+        }
     }
 }
+
