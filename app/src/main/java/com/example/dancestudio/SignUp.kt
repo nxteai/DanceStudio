@@ -128,6 +128,9 @@ fun SignUpScreen(navController: NavHostController) {
                                     .addOnFailureListener {
                                         Toast.makeText(context, "Failed to save user data", Toast.LENGTH_SHORT).show()
                                     }
+                                navController.navigate("home") {
+                                    popUpTo("signup") { inclusive = true }
+                                }
                             } else {
                                 Toast.makeText(context, "Sign up failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                             }

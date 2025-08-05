@@ -83,6 +83,7 @@ fun LoginScreen(navController: NavHostController) {
                             Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
                             navController.navigate("home") {
                                 popUpTo("login") { inclusive = true }
+
                             }
                         } else {
                             Toast.makeText(

@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -22,11 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.dancestudio.ui.theme.DanceStudioTheme
 import com.example.dancestudio.ui.theme.Manrope
 
@@ -34,16 +33,19 @@ import com.example.dancestudio.ui.theme.Manrope
  * Main composable function for the Studio List screen.
  * Displays the location header, search input, filter chips, and a scrollable list of studio cards.
  */
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudioListScreen(
+    navController: NavHostController,
     modifier: Modifier = Modifier,
-    onStudioSelected: (Studio) -> Unit = {},  // Callback when a studio card is clicked
-    onFilterChanged: (FilterType) -> Unit = {} // Callback when a filter is selected
+    onStudioSelected: (Studio) -> Unit = {},
+    onFilterChanged: (FilterType) -> Unit = {}
 ) {
-    var searchQuery by remember { mutableStateOf("") } // Search input state
-    val filters = listOf("Best", "Popular", "Nearby", "New", "Affordable") // List of filter options
-    var selectedFilter by remember { mutableIntStateOf(0) } // Index of the selected filter
+    var searchQuery by remember { mutableStateOf("") }
+    val filters = listOf("Best", "Popular", "Nearby", "New", "Affordable")
+    var selectedFilter by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = modifier
@@ -315,6 +317,7 @@ enum class FilterType { BEST, POPULAR, NEARBY, NEW, AFFORDABLE }
 @Composable
 fun StudioListPreview() {
     DanceStudioTheme {
-        StudioListScreen()
+        val dummyNavController = rememberNavController()
+        StudioListScreen(navController = dummyNavController)
     }
 }
